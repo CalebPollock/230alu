@@ -8,9 +8,49 @@ module top(
    output [6:0] seg
 );
 
+   wire [7:0]A;
+   wire [7:0]B;
+   
    wire [7:0]Y;
    wire [3:0]OP;
    wire slow_clock;
+
+   wire enable_a;
+
+   assign led[15:8] = A;
+   assign led[7:0] = B;
+   assign OP = sw[3:0];
+
+   ALU alu(
+      .A(A),
+      .B(B),
+      .external(sw[15:8]),
+      .trigger(btnU),
+      .op(OP),
+      .Y(Y)
+   );
+
+   swap SWAP(
+      .A(A),
+      .B(B),
+      .trigger(btnU),
+      .op(OP)
+   );
+
+   load LOAD(
+      .A(A),
+      .external(sw[15:8]),
+      .trigger(btnU),
+      .op(OP)
+   );
+
+   reset RESET(
+      .A(A),
+      .B(B),
+      .Y(Y),
+      .trigger(btnC)
+   );
+
 
    // Divide the clock, outputing a much slower
    // one
@@ -28,7 +68,6 @@ module top(
       .reset(btnU),
       .anode(an)
    );
-
 
    // Display a given value based on the selected
    // anode. OP is shown on an[0] and Y is on an[3:2].
