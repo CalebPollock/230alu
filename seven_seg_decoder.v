@@ -1,5 +1,5 @@
 module seven_seg_decoder(
-   input [15:0] Y,
+   input [7:0] Y,
    input [3:0] OP,
    input [3:0] anode,
    output reg [6:0] segs
@@ -11,8 +11,8 @@ module seven_seg_decoder(
       case (anode)
          4'b1110: selected_sig <= OP;
          4'b1101: selected_sig <= 0;
-         4'b1011: selected_sig <= Y[7:0];
-         4'b0111: selected_sig <= Y[15:8];
+         4'b1011: selected_sig <= Y[3:0];
+         4'b0111: selected_sig <= Y[7:4];
       endcase
    end
 
