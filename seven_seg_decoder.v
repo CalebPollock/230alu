@@ -9,10 +9,10 @@ module seven_seg_decoder(
 
    always @(*) begin
       case (anode)
-         4'b0001: selected_sig <= OP;
-         4'b0010: selected_sig <= 0;
-         4'b0100: selected_sig <= Y[7:0];
-         4'b1000: selected_sig <= Y[15:8];
+         4'b1110: selected_sig <= OP;
+         4'b1101: selected_sig <= 0;
+         4'b1011: selected_sig <= Y[7:0];
+         4'b0111: selected_sig <= Y[15:8];
       endcase
    end
 
