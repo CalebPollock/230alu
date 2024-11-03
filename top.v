@@ -8,19 +8,23 @@ module top(
    output [6:0] seg
 );
 
-   wire [7:0]A;
-   wire [7:0]B;
-   
-   wire [7:0]Y;
-   wire [3:0]OP;
+   wire [7:0] A;             // Register output A
+   wire [7:0] B;             // Register output B
+   wire [7:0] Y;             // Output from ALU
+   wire [3:0] OP;            // Operation selector
    wire slow_clock;
 
-   wire enable_a;
+   // Control signals for the Registers module
+   wire load_a, load_b, swap, reset;
 
-   assign led[15:8] = A;
-   assign led[7:0] = B;
+   // Operation code from switches
    assign OP = sw[3:0];
 
+   // LEDs to display contents of A and B
+   assign led[15:8] = A;
+   assign led[7:0] = B;
+
+   // Instantiate ALU core
    ALU alu(
       .A(A),
       .B(B),
@@ -30,47 +34,39 @@ module top(
       .Y(Y)
    );
 
-   swap SWAP(
+   // Instantiate Registers module
+   Registers registers(
+      .data_in(sw[15:8]),
+      .load_a(load_a),
+      .load_b(load_b),
+      .swap(swap),
+      .reset(btnC),
+      .clk(clk),
       .A(A),
-      .B(B),
-      .trigger(btnU),
-      .op(OP)
+      .B(B)
    );
 
-   load LOAD(
-      .A(A),
-      .external(sw[15:8]),
-      .trigger(btnU),
-      .op(OP)
-   );
+   // Set control signals based on OP code
+   assign load_a = (OP == 4'b1111);      // Load into A
+   assign load_b = (OP == 4'b1101);      // Store A in B (as per lab instructions)
+   assign swap   = (OP == 4'b1110);      // Swap A and B
+   assign reset  = btnC;                 // Reset when btnC is pressed
 
-   reset RESET(
-      .A(A),
-      .B(B),
-      .Y(Y),
-      .trigger(btnC)
-   );
-
-
-   // Divide the clock, outputing a much slower
-   // one
+   // Clock Divider to slow down the display
    clock_div #(.BIT_COUNT(16)) count(
       .clock(clk),
       .reset(btnU),
       .div_clock(slow_clock)
    );
 
-   // Iterativly select over each anode in
-   // the segment display. Tick based on the
-   // slow_clock from clock_div
+   // Seven-Segment Display Scanner
    seven_seg_scanner sss(
       .div_clock(slow_clock),
       .reset(btnU),
       .anode(an)
    );
 
-   // Display a given value based on the selected
-   // anode. OP is shown on an[0] and Y is on an[3:2].
+   // Seven-Segment Display Decoder
    seven_seg_decoder ssd(
       .Y(Y),
       .OP(OP),
@@ -79,3 +75,4 @@ module top(
    );
 
 endmodule
+
