@@ -7,13 +7,15 @@ module Registers (
         if (reset) begin
             A <= 8'b0;
             B <= 8'b0;
-        end else if (load_a) begin
-            A <= data_in;
-        end else if (load_b) begin
-            B <= data_in;
-        end else if (swap) begin
-            A <= B;
-            B <= A;
+        end else begin
+            if (load_a) A <= data_in;
+            if (load_b) B <= data_in;
+            if (swap) begin
+                reg [7:0] temp;
+                temp = A;
+                A <= B;
+                B <= temp;
+            end
         end
     end
 endmodule
