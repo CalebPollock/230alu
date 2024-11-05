@@ -27,7 +27,7 @@ module ALU (
     always @(posedge trigger) begin
         case (op)
             4'b0000: Y <= add_result;               // ADD using full_adder chain
-            4'b0001: Y <= A - B;                    // SUB
+            4'b0001: Y <= B - A;                    // SUB
             4'b0010: Y <= A << 1;                   // Shift left
             4'b0011: Y <= A >> 1;                   // Shift right
             4'b0100: Y <= (A == B) ? 0 : (A > B ? 1 : -1); // Comparison
@@ -39,7 +39,7 @@ module ALU (
             4'b1010: Y <= ~(A ^ B);                 // XNOR
             4'b1011: Y <= ~A;                       // NOT
             4'b1100: Y <= twos_compl_result;        // Two’s Complement using full_adder chain
-            4'b1101: Y <= A;                        // Store A in Y (for Store A operation)
+            4'b1101: ;                              // Don't reset Y on store
             default: Y <= 8'b00000000;              // Default case
         endcase
     end
